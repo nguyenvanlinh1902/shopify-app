@@ -1,0 +1,26 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+name = "instagram-feed"
+client_id = "a193ca5bd0a86e176eb6550eeb7d8955"
+application_url = "https://pool-review-line-kansas.trycloudflare.com/auth/shopify"
+embedded = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = ""
+
+[auth]
+redirect_urls = [
+  "https://pool-review-line-kansas.trycloudflare.com/auth/shopify/callback",
+  "https://pool-review-line-kansas.trycloudflare.com/authSa/shopify/callback",
+  "https://pool-review-line-kansas.trycloudflare.com/auth/shopify/embed/callback",
+  "https://localhost:3000/auth/shopify/callback",
+  "https://localhost:3000/authSa/shopify/callback",
+  "https://localhost:3000/auth/shopify/embed/callback"
+]
+
+[webhooks]
+api_version = "2024-07"
+
+[pos]
+embedded = false

@@ -1,0 +1,94 @@
+.wrapper {
+  max-width: 380px;
+  min-width: 320px;
+  position: relative;
+  z-index: 999999;
+  boder-radius: 20px
+}
+.wrapper.fadeInUp.animated{
+  border-radius: 20px;
+}
+
+@media screen and (max-width: 575px) {
+  .wrapper {
+    left: 15px;
+  }
+}
+.wrapper img {
+  max-width: 135px;
+  opacity: 0;
+  visibility: hidden;
+  position: absolute;
+  top: -100px;
+  left: -10px;
+  text-align: center;
+}
+
+.wrapper .product {
+  position: relative;
+}
+
+.wrapper .card-container {
+  padding: 5px;
+  border-radius: 20px;
+  box-shadow: 3px 0 5px rgba(5, 5, 5, 0.07);
+  position: relative;
+}
+
+.wrapper .product-image {
+  height: 65px;
+  border-radius: 15px;
+  color: #43495a;
+  font-size: 55px;
+  width: 65px;
+  display: inline-block;
+  text-align: center;
+  vertical-align: top;
+  font-weight: bold;
+  line-height: 69px;
+  background-size: cover;
+  background-position: center;
+}
+
+.wrapper .content {
+  color: #1d1c1c;
+  display: inline-block;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 15px;
+}
+
+.wrapper .customer-title {
+  font-size: 12px;
+  margin-bottom: 0;
+}
+
+.wrapper .subtitle {
+  margin-bottom: 0;
+  font-size: 10px;
+}
+
+.wrapper .footer {
+  font-size: 10px;
+  line-height: 16px;
+  margin-top: 5px;
+}
+.mp-right{
+  text-align: end;
+}
+.wrapper .uni-blue {
+  color: #2196f3;
+  border-left: 1px solid #e2e4e9;
+  margin-left: 8px;
+  padding-left: 8px;
+}
+
+.wrapper .close-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}

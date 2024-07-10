@@ -1,0 +1,72 @@
+.MediaModal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 90%;
+  max-height: 90%;
+  overflow: auto;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.Overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+}
+
+.MediaModalContent {
+  display: flex;
+  justify-content: space-around;
+}
+
+.MediaSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.InfoSection,
+.MediaItem {
+  width: 50%;
+  height: auto;
+}
+
+.NavigateButton {
+  background: transparent;
+  border: none;
+  font-size: 8rem;
+  cursor: pointer;
+  color: red;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.NavigateButton.Prev {
+  left: 10px;
+}
+
+.NavigateButton.Next {
+  right: 10px;
+}
+
+.CloseButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+}

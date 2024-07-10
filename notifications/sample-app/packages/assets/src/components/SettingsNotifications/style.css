@@ -1,0 +1,34 @@
+.desktop-position-options {
+  display: flex;
+  gap: 10px;
+}
+
+.desktop-position {
+  display: flex;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  width: 25%;
+  padding: 10px;
+  height: 100px;
+}
+.bottom-left, .bottom-right, .top-left, .top-right{
+  width: 60px;
+}
+.bottom-left{
+  margin-top: 50%;
+}
+.bottom-right{
+  margin-top: 50%;
+  margin-left: 50%;
+}
+.top-right{
+  margin-left: 50%;
+}
+.desktop-position.selected {
+  border-color: #007ace;
+}
+.desktop-position.selected .Polaris-SkeletonDisplayText__DisplayText{
+  background: #007ace;
+
+}

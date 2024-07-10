@@ -1,0 +1,30 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+name = "notifications"
+client_id = "06b7bad5f8b2cd790bd535213b0e57cb"
+application_url = "https://rendering-likely-eq-quantities.trycloudflare.com/auth/shopify"
+embedded = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = ""
+
+[auth]
+redirect_urls = [
+  "https://rendering-likely-eq-quantities.trycloudflare.com/auth/shopify/callback",
+  "https://rendering-likely-eq-quantities.trycloudflare.com/authSa/shopify/callback",
+  "https://rendering-likely-eq-quantities.trycloudflare.com/auth/shopify/embed/callback",
+  "https://localhost:3000/auth/shopify/callback",
+  "https://localhost:3000/authSa/shopify/callback",
+  "https://localhost:3000/auth/shopify/embed/callback"
+]
+
+[webhooks]
+api_version = "2024-04"
+
+[pos]
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "site-extension.myshopify.com"

@@ -1,0 +1,30 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+name = "first-app"
+client_id = "b31834f7412a5b1972def9165b3bfe0d"
+application_url = "https://cycling-plug-adaptive-roman.trycloudflare.com/auth/shopify"
+embedded = true
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+use_legacy_install_flow = true
+
+[auth]
+redirect_urls = [
+  "https://cycling-plug-adaptive-roman.trycloudflare.com/auth/shopify/callback",
+  "https://cycling-plug-adaptive-roman.trycloudflare.com/authSa/shopify/callback",
+  "https://cycling-plug-adaptive-roman.trycloudflare.com/auth/shopify/embed/callback",
+  "https://localhost:3000/auth/shopify/callback",
+  "https://localhost:3000/authSa/shopify/callback",
+  "https://localhost:3000/auth/shopify/embed/callback"
+]
+
+[webhooks]
+api_version = "2024-04"
+
+[pos]
+embedded = false
+
+[build]
+automatically_update_urls_on_dev = true
+dev_store_url = "mageplaza-linhnv3.myshopify.com"
