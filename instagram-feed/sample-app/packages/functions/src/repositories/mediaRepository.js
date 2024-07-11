@@ -1,6 +1,5 @@
 import {Firestore} from '@google-cloud/firestore';
 import Instagram from '../helpers/instagram';
-import chunkArray from '@functions/helpers/utils/chunkArray';
 
 const firestore = new Firestore();
 const mediaRef = firestore.collection('media');
@@ -13,18 +12,25 @@ const instagram = new Instagram();
  */
 export async function getMedia(shopId) {
   try {
-    // Lấy thông tin media từ Firestore
+    // Fetch media information from Firestore
     const snapshot = await mediaRef.where('shopId', '==', shopId).get();
     const media = [];
+    const updates = [];
+
     for (const doc of snapshot.docs) {
       const docData = doc.data();
       if (Array.isArray(docData.media)) {
         for (const mediaItem of docData.media) {
           if (mediaItem.media_url && !isIgMediaUrlValidTill(mediaItem.media_url)) {
-            // Nếu media_url hết hạn, lấy lại thông tin từ Instagram API
+            // If media_url has expired, fetch new information from Instagram API
             try {
-              const updatedMedia = await instagram.getMediaByAccessToken(docData.accessToken);
-              await syncMedia(chunkArray(updatedMedia.data, 5), shopId); // Sử dụng await để đảm bảo việc đồng bộ hóa hoàn tất trước khi tiếp tục
+              const updatedMedia = await Instagram.getMediaById(mediaItem.id, docData.accessToken);
+              updates.push({
+                docId: doc.id,
+                mediaId: mediaItem.id,
+                newMediaUrl: updatedMedia.media_url
+              }); // Collect updates
+              media.push({...updatedMedia, shopId});
             } catch (error) {
               console.error(`Failed to update media for shop ${shopId}:`, error);
             }
@@ -35,19 +41,60 @@ export async function getMedia(shopId) {
       }
     }
 
+    // Batch update media URLs in Firestore
+    if (updates.length > 0) {
+      await batchUpdateMediaUrlsInFirestore(shopId, updates);
+    }
+
     return media;
   } catch (error) {
     console.error('Error getting media:', error);
     return [];
   }
 }
+/**
+ * Batch update media URLs in Firestore
+ * @param {string} shopId
+ * @param {Array} updates - List of updates with docId, mediaId, and newMediaUrl
+ * @return {Promise<void>}
+ */
+async function batchUpdateMediaUrlsInFirestore(shopId, updates) {
+  try {
+    const batch = firestore.batch();
+
+    const mediaDocs = await mediaRef.where('shopId', '==', shopId).get();
+
+    mediaDocs.forEach(doc => {
+      const docData = doc.data();
+      let updated = false;
+      docData.media = docData.media.map(item => {
+        const update = updates.find(u => u.docId === doc.id && u.mediaId === item.id);
+        if (update) {
+          updated = true;
+          return {...item, media_url: update.newMediaUrl};
+        }
+        return item;
+      });
+      if (updated) {
+        const docRef = mediaRef.doc(doc.id);
+        batch.set(docRef, docData, {merge: true}); // Add the update to the batch
+      }
+    });
+
+    await batch.commit(); // Commit the batch operation
+    console.log(`Updated media URLs for shop ${shopId}`);
+  } catch (error) {
+    console.error(`Failed to batch update media URLs for shop ${shopId}:`, error);
+  }
+}
 
 /**
  * Đồng bộ media vào Firestore.
  * Cập nhật các media hiện có hoặc thêm mới các media vào các tài liệu.
- * @param {Array<Array>} mediaChunks - Các chunk của media với kích thước tối đa 5.
- * @param {string} shopId - ID của shop.
- * @returns {Promise<boolean>} - Trả về true nếu thành công, false nếu thất bại.
+ *
+ * @param mediaChunks
+ * @param shopId
+ * @returns {Promise<*|boolean>}
  */
 export async function syncMedia(mediaChunks, shopId) {
   try {
@@ -115,7 +162,7 @@ export async function syncMedia(mediaChunks, shopId) {
     });
 
     await batch.commit();
-    return true;
+    return updatedMedia;
   } catch (error) {
     console.error('Error syncing media:', error);
     return false;
@@ -166,9 +213,9 @@ function isIgMediaUrlValidTill(mediaUrl, till = new Date()) {
  */
 function hasMediaChanged(existingMedia, newMedia) {
   return (
-    existingMedia.media_type !== newMedia.media_type ||
-    existingMedia.media_url !== newMedia.media_url ||
-    existingMedia.timestamp !== newMedia.timestamp ||
-    Object.keys(existingMedia).some(key => existingMedia[key] !== newMedia[key])
+      existingMedia.media_type !== newMedia.media_type ||
+      existingMedia.media_url !== newMedia.media_url ||
+      existingMedia.timestamp !== newMedia.timestamp ||
+      Object.keys(existingMedia).some(key => existingMedia[key] !== newMedia[key])
   );
 }

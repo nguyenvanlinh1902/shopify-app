@@ -41,7 +41,7 @@ class Instagram {
   async getLongLivedTokens(access_token) {
     try {
       const response = await axios.get(
-        `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${this.clientSecret}&access_token=${access_token}`
+          `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${this.clientSecret}&access_token=${access_token}`
       );
 
       return response.data.access_token;
@@ -55,16 +55,34 @@ class Instagram {
    * @param {string} access_token
    * @return {Promise<object>} user
    */
-  async getUserByAccessToken(access_token) {
+  static async getUserByAccessToken(access_token) {
     try {
       const response = await axios.get(
-        `https://graph.instagram.com/me?fields=id,username&access_token=${access_token}`
+          `https://graph.instagram.com/me?fields=id,username&access_token=${access_token}`
       );
 
       return {...response.data, accessToken: access_token};
     } catch (error) {
       console.error(error);
       throw new Error('Failed to get user by access token');
+    }
+  }
+  /**
+   * Get media by media ID and access token
+   * @param {string} mediaId
+   * @param {string} accessToken
+   * @return {Promise<object>} media
+   */
+  static async getMediaById(mediaId, accessToken) {
+    try {
+      const response = await axios.get(
+          `https://graph.instagram.com/${mediaId}?fields=id,caption,media_url,timestamp,media_type,thumbnail_url&access_token=${accessToken}`
+      );
+
+      return response.data;
+    } catch (error) {
+      console.error(error);
+      throw new Error(`Failed to get media by ID ${mediaId}`);
     }
   }
 
@@ -75,7 +93,7 @@ class Instagram {
   async getMediaByAccessToken(access_token) {
     try {
       const response = await axios.get(
-        `https://graph.instagram.com/me/media?fields=id,caption,media_url,timestamp,media_type,thumbnail_url&limit=30&access_token=${access_token}`
+          `https://graph.instagram.com/me/media?fields=id,caption,media_url,timestamp,media_type,thumbnail_url&limit=30&access_token=${access_token}`
       );
 
       return response.data;
@@ -92,7 +110,7 @@ class Instagram {
   async refreshLongLivedToken(accessToken) {
     try {
       const response = await axios.get(
-        `https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=${accessToken}&client_secret=${this.clientSecret}`
+          `https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=${accessToken}&client_secret=${this.clientSecret}`
       );
 
       return response.data.access_token;
