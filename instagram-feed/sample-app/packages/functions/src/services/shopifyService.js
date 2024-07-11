@@ -37,7 +37,6 @@ export async function getAppInfo(shop, themeId = '') {
   }
 }
 
-
 export async function checkAddedAppEmbed({shopify, themeId}) {
   try {
     const templateJson = await shopify.asset.get(themeId, {

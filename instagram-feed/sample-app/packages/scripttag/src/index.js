@@ -11,7 +11,6 @@ const Preview = React.lazy(() => import('../../assets/src/components/MainFeed/Pr
     const cachedData = localStorage.getItem(cacheKey);
 
     if (cachedData) {
-      console.log('test1');
       return JSON.parse(cachedData);
     }
 
@@ -23,17 +22,10 @@ const Preview = React.lazy(() => import('../../assets/src/components/MainFeed/Pr
 
   const data = await getData();
 
-  const container = document.getElementById('instagramContainer');
+  const instagramContainer = document.getElementById('instagramContainer');
 
-  const main = document.getElementById('MainContent');
-  main.insertBefore(container, main.firstChild); // Add container before the first child of main
-
-  const root = createRoot(container);
+  const root = createRoot(instagramContainer);
   requestIdleCallback(() => {
-    root.render(
-      <Suspense fallback={<div>Loading...</div>}>
-        <Preview settings={data.data.settings} media={data.data.media} />
-      </Suspense>
-    );
+    root.render(<Preview settings={data.data.settings} media={data.data.media} />);
   });
 })();

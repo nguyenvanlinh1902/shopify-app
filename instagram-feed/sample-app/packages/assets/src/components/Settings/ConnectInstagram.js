@@ -16,7 +16,6 @@ export default function ConnectInstagram({settings, setSettings, setMedia, media
   const openLoginPopUp = () => {
     const authUrl = `https://api.instagram.com/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}/clientApi/getToken&scope=user_profile,user_media&response_type=code&state=${window.activeShop.id}`;
     const popup = window.open(authUrl, 'auth', 'height=500,width=400');
-
     const isPopUpClosed = setInterval(async () => {
       try {
         if (popup.location.href.includes('code')) {

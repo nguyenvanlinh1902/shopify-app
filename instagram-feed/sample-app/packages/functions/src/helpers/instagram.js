@@ -20,10 +20,7 @@ class Instagram {
       formData.append('client_id', this.clientId);
       formData.append('client_secret', this.clientSecret);
       formData.append('grant_type', 'authorization_code');
-      formData.append(
-        'redirect_uri',
-        'https://shaft-reputation-municipal-continental.trycloudflare.com/clientApi/getToken'
-      );
+      formData.append('redirect_uri', 'https://localhost:3000/clientApi/getToken');
       formData.append('code', code);
 
       const response = await axios.post(`https://api.instagram.com/oauth/access_token`, formData, {

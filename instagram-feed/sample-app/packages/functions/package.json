@@ -2,7 +2,6 @@
   "name": "@avada/functions",
   "version": "0.0.1",
   "main": "lib/index.js",
-  "type": "module",
   "engines": {
     "node": "20"
   },

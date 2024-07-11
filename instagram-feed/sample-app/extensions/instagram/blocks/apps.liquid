@@ -1,12 +1,53 @@
+<script>
+  window.setting = {{ shop.metafields.shopify_app.setting.value | json }};
+</script>
 {% schema %}
 {
   "name": "instagram-feed",
-  "target": "body",
+  "target": "section",
   "javascript": "instagram-feed.js",
+  "stylesheet": "instagram-feed.css",
   "settings": []
 }
 {% endschema %}
 
 <div id="instagramContainer">
-  <p>Loading Instagram feed...</p>
+  <div class="page-width">
+    <span>Default Title</span>
+    <div style="display: grid; grid-template-columns: repeat({{ shop.metafields.shopify_app.setting.value.numberOfColumns }}, 1fr); grid-gap: 10px;">
+      {% assign numberOfColumns = shop.metafields.shopify_app.setting.value.numberOfColumns %}
+      {% assign qtyMedia = shop.metafields.shopify_app.setting.value.qtyMedia %}
+      {% assign count = numberOfColumns | times: numberOfColumns %}
+      {% if count > qtyMedia %}
+        {% assign count = qtyMedia %}
+      {% endif %}
+
+      {% for i in (1..count) %}
+        {% assign media = window.setting.media[i-1] %}
+        {% if media %}
+          <div class="Mageplaza-Gird-Media">
+            <img
+              class="Mageplaza-MediaItem"
+              src="{{ media.image_url }}"
+              alt="{{ media.alt_text }}"
+              loading="lazy"
+              width="auto"
+              height="auto"
+            />
+          </div>
+        {% else %}
+          <div class="Mageplaza-Gird-Media">
+            <img
+              class="Mageplaza-MediaItem"
+              src="https://via.placeholder.com/600x400?text=Image+{{ i }}"
+              alt="Instagram Image"
+              loading="lazy"
+              width="auto"
+              height="auto"
+            />
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
 </div>

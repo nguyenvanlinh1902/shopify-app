@@ -22,12 +22,9 @@ export async function getSettings(shopId) {
   try {
     const doc = await settingsRef.doc(shopId).get();
     if (!doc.exists) {
-      // If settings do not exist, set default values
-      await setSettings(shopId, defaultSettings);
       return defaultSettings;
-    } else {
-      return doc.data();
     }
+    return doc.data();
   } catch (error) {
     console.error('Error getting settings:', error);
     return null;
@@ -48,19 +45,4 @@ export async function setSettings(shopId, settings) {
     console.error('Error setting settings:', error);
     return false;
   }
-}
-
-/**
- *
- * @param settings
- * @param shopId
- * @returns {Promise<boolean>}
- */
-export async function syncSettings(settings, shopId) {
-  const updatedSettings = {
-    ...(await getSettings(shopId)),
-    ...settings
-  };
-
-  return setSettings(updatedSettings.shopId, updatedSettings);
 }
