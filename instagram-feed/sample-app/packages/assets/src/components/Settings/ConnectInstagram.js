@@ -10,6 +10,7 @@ export default function ConnectInstagram({settings, setSettings, setMedia, media
   const {handleCreate: handleLogout} = useCreateApi({url: '/logout'});
   // Fetch media data with settings accessToken
   const {fetchApi, data: mediaData} = useFetchApi({
+    initLoad: 'false',
     url: '/sync-media?token=' + settings?.accessToken
   });
   // Hàm mở popup để đăng nhập với Instagram

@@ -22,6 +22,5 @@ export default function getRoutes(prefix = '/api') {
   router.get('/settings', settingsController.getSettingsController);
   router.put('/settings', settingsController.updateSettingsController);
   router.get('/sync-media', mediaController.handleGetNewMedia);
-  router.put('/updateMedia', mediaController.handleUpdateMedia);
   return router;
 }

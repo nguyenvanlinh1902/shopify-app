@@ -6,6 +6,8 @@ import './Preview.scss';
 
 // eslint-disable-next-line react/prop-types
 function Preview({settings, media}) {
+  console.log('media');
+  console.log(media);
   const mediaToShow = media.slice(0, settings.numberOfRows * settings.numberOfColumns);
   const gridStyle = {
     display: 'grid',
@@ -50,6 +52,8 @@ function Preview({settings, media}) {
                       src={item.media_url}
                       alt={item.caption}
                       loading="lazy"
+                      width="auto"
+                      height="auto"
                     />
                   )}
                   {item.media_type === 'VIDEO' && (

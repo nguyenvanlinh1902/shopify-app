@@ -3,6 +3,7 @@ import {getSettings, setSettings} from '@functions/repositories/settingRepositor
 import {getMedia, getUniqueMediaCount} from '@functions/repositories/mediaRepository';
 import {initShopify} from '../../lib/services/shopifyService';
 import {getShopById} from '@avada/core';
+import {getInfoMedia} from '@functions/controllers/mediaController';
 
 /**
  * Get current settings of a shop
@@ -13,7 +14,8 @@ import {getShopById} from '@avada/core';
 export async function getSettingsController(ctx) {
   try {
     const shopId = getCurrentShop(ctx);
-    const [settings, media] = await Promise.all([getSettings(shopId), getMedia(shopId)]);
+    const settings = await getSettings(shopId);
+    const media = await getInfoMedia(shopId, settings.accessToken);
     if (!settings) {
       ctx.status = 500;
       ctx.body = {success: false, error: 'Internal Server Error'};
@@ -23,6 +25,8 @@ export async function getSettingsController(ctx) {
       settings: settings,
       media: media
     };
+    console.log('media');
+    console.log(media);
     ctx.body = {success: true, data: data};
   } catch (error) {
     ctx.status = 500;

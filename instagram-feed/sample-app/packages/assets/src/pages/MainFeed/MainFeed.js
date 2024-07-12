@@ -65,7 +65,6 @@ export default function InstagramFeedSettings() {
   if (loading) {
     return <Page title="Main Feed">Loading...</Page>;
   }
-
   return (
     <Page title="Main Feed">
       <Layout sectioned>
