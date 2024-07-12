@@ -20,6 +20,21 @@ export async function getMedia(shopId) {
   }
 }
 /**
+ * Lấy tất cả các đối tượng media từ Firestore cho một shop cụ thể.
+ *
+ * @param {string} shopId - ID của cửa hàng để liên kết với các media
+ * @returns {Promise<Array>} - Promise chứa mảng các đối tượng media
+ */
+export async function getDataMedia(shopId) {
+  try {
+    const querySnapshot = await mediaRef.where('shopId', '==', shopId).get();
+    return querySnapshot.docs.map(doc => ({id: doc.id, data: doc.data()}));
+  } catch (error) {
+    console.log(error);
+    return [];
+  }
+}
+/**
  * Set media items into Firestore for a shop
  * @param {string} shopId - The ID of the shop to associate the media with
  * @param {Array} media - Array of media objects to set or update
@@ -57,11 +72,9 @@ export async function syncMedia(media, shopId) {
     if (!existingDocs.length) {
       const mediaData = chunkArray(media, 5);
       await setMedia(mediaData, shopId);
-      return true;
+      return media;
     }
-    const updates = prepareUpdates(existingDocs, media, 'sync');
-    await batchUpdateFirestore(updates);
-    return true;
+    return prepareUpdates(existingDocs, media, shopId, 'sync');
   } catch (error) {
     console.error('Lỗi khi đồng bộ media:', error);
     return false;
@@ -73,7 +86,7 @@ export async function syncMedia(media, shopId) {
  * @param {Map} updates - Map chứa các cập nhật hoặc tạo mới tài liệu trong Firestore
  * @returns {Promise<void>}
  */
-async function batchUpdateFirestore(updates) {
+export async function batchUpdateFirestore(updates) {
   updates.forEach((data, docId) => {
     const docRef = mediaRef.doc(docId);
     batch.set(docRef, data, {merge: true});
@@ -119,25 +132,5 @@ export async function getUniqueMediaCount(shopId) {
   } catch (error) {
     console.error('Error getting unique media count:', error);
     throw new Error('Failed to get unique media count');
-  }
-}
-
-/**
- * Cập nhật lại thông tin media vào Firestore.
- * So sánh và cập nhật hoặc thêm mới các đối tượng media vào Firestore.
- *
- * @param {string} shopId - ID của cửa hàng để liên kết với các media
- * @param {Array} media - Mảng các đối tượng media cần cập nhật
- * @returns {Promise<void>}
- */
-export async function bulkUpdate(media, shopId) {
-  try {
-    const snapshot = await mediaRef.where('shopId', '==', shopId).get();
-    const existingDocs = snapshot.docs.map(doc => ({id: doc.id, data: doc.data()}));
-    const updates = prepareUpdates(existingDocs, media);
-    await batchUpdateFirestore(updates);
-    console.log('Media has been updated successfully.');
-  } catch (error) {
-    console.error('Error updating media:', error);
   }
 }

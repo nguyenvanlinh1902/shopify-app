@@ -1,23 +1,32 @@
 import Instagram from '../helpers/instagram';
-import {syncMedia, getMedia, bulkUpdate} from '../repositories/mediaRepository';
+import {
+  batchUpdateFirestore,
+  getDataMedia,
+  getMedia,
+  setMedia,
+  syncMedia
+} from '../repositories/mediaRepository';
 import {getCurrentShop} from '../helpers/auth';
 import {getSettings} from '@functions/repositories/settingRepository';
+import chunkArray from '@functions/helpers/utils/chunkArray';
 
 const instagram = new Instagram();
 
+/**
+ *
+ * @param ctx
+ * @returns {Promise<void>}
+ */
 export async function handleGetNewMedia(ctx) {
-  console.log('test1111111111111111111111111111111111');
   const shopId = getCurrentShop(ctx);
   const settings = await getSettings(shopId);
   const longLivedTokens = settings.accessToken; // Assuming settings have accessToken
 
   const media = await instagram.getMediaByAccessToken(longLivedTokens);
 
-  await syncMedia(media.data, shopId);
-  const allMedia = await getMedia(shopId);
+  const allMedia = await syncMedia(media.data, shopId);
   ctx.body = {success: false, data: allMedia};
 }
-
 /**
  *
  * @param shopId
@@ -25,19 +34,19 @@ export async function handleGetNewMedia(ctx) {
  * @returns {Promise<Array>}
  */
 export async function getInfoMedia(shopId, accessToken) {
-  const allMedia = await getMedia(shopId);
+  const mediaData = await getDataMedia(shopId);
+  const allMedia = mediaData.flatMap(item => item.data.media);
   const mediaWithUrlStatus = allMedia.map(mediaItem => ({
     ...mediaItem,
     isUrlValid: isIgMediaUrlValidTill(mediaItem.media_url)
   }));
   if (mediaWithUrlStatus.some(media => !media.isUrlValid)) {
     const newMedia = await instagram.getMediaByAccessToken(accessToken);
-    await bulkUpdate(newMedia.data, shopId);
-    return await getMedia(shopId);
+    return prepareUpdates(mediaData, newMedia, shopId);
   }
-
   return allMedia;
 }
+
 /**
  * Check if Instagram media URL is valid till a given date
  * @param {string} mediaUrl
@@ -59,13 +68,15 @@ function isIgMediaUrlValidTill(mediaUrl, till = new Date()) {
  *
  * @param {Array} existingDocs - Mảng các tài liệu media hiện có
  * @param {Array} media - Mảng các đối tượng media cần đồng bộ hóa hoặc thêm mới
+ * @param shopId
  * @param type
  * @returns {Map} - Map chứa các cập nhật hoặc tạo mới tài liệu trong Firestore
  */
-export function prepareUpdates(existingDocs, media, type = 'update') {
+export async function prepareUpdates(existingDocs, media, shopId, type = 'update') {
   const updates = new Map();
+  const newMedia = [];
   const allExistingMediaIds = new Set(
-    existingDocs.flatMap(doc => doc.data.media.map(item => item.id))
+      existingDocs.flatMap(doc => doc.data.media.map(item => item.id))
   );
 
   // Tạo một map từ media mới với id làm key
@@ -94,5 +105,15 @@ export function prepareUpdates(existingDocs, media, type = 'update') {
     };
     updates.set(docId, updatedDoc);
   });
-  return updates;
+  await batchUpdateFirestore(updates);
+  if (type !== 'update') {
+    media.forEach(mediaItem => {
+      if (!allExistingMediaIds.has(mediaItem.id)) {
+        newMedia.push(mediaItem);
+      }
+    });
+    await setMedia(chunkArray(newMedia, 5), shopId);
+  }
+
+  return [...Array.from(updates.values()).flatMap(doc => doc.media), ...newMedia];
 }
